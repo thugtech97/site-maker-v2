@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Site;
 
 use Exception;
 use App\Models\Site;
@@ -87,6 +87,6 @@ class CreateSiteForm extends Component
 
     public function render()
     {
-        return view('livewire.create-site-form');
+        return view('livewire.site.create-site-form');
     }
 }

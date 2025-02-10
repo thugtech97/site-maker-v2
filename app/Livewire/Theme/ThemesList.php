@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Theme;
 
 use App\Models\Theme;
 use Livewire\Component;
@@ -13,6 +13,6 @@ class ThemesList extends Component
     {
         $themes = Theme::paginate(5);
 
-        return view('livewire.themes-list', ['themes' => $themes]);
+        return view('livewire.theme.themes-list', ['themes' => $themes]);
     }
 }

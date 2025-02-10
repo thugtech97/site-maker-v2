@@ -31,7 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
     Livewire::setUpdateRoute(function ($handle) {
-        return Route::post('livewire/update', $handle);
+        return Route::post('/site-maker-v2/public/livewire/update', $handle);
     });
 
 });

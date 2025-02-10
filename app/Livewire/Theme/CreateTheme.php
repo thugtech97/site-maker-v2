@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Theme;
 
 use Exception;
 use App\Models\Theme;
@@ -47,6 +47,6 @@ class CreateTheme extends Component
 
     public function render()
     {
-        return view('livewire.create-theme');
+        return view('livewire.theme.create-theme');
     }
 }

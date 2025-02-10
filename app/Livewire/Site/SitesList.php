@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Site;
 
 use App\Models\Site;
 use Livewire\Component;
@@ -29,7 +29,7 @@ class SitesList extends Component
     {
         $sites = Site::paginate(6);
 
-        return view('livewire.sites-list', [
+        return view('livewire.site.sites-list', [
             'sites' => $sites
         ]);
     }

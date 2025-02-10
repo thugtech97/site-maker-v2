@@ -10,7 +10,7 @@
         </div>
 
         <!-- Livewire Component -->
-        @livewire('user-list')
+        @livewire('user.user-list')
     </div>
 </div>
 @endsection

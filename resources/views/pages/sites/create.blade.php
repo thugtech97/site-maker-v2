@@ -11,7 +11,7 @@
         <div>
             <h1 class="text-center text-primary mb-4">Create a Site</h1>
         </div>
-        @livewire('create-site-form')
+        @livewire('site.create-site-form')
     </div>
 </div>
 @endsection

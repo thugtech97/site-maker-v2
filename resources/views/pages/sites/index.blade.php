@@ -10,7 +10,7 @@
         </div>
 
         <!-- Livewire Component -->
-        @livewire('sites-list')
+        @livewire('site.sites-list')
     </div>
 </div>
 @endsection

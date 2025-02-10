@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\User;
 
 use App\Models\User;
 use Livewire\Component;
@@ -13,6 +13,6 @@ class UserList extends Component
     {
         $users = User::paginate(5);
 
-        return view('livewire.user-list', ['users' => $users]);
+        return view('livewire.user.user-list', ['users' => $users]);
     }
 }

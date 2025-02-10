@@ -10,7 +10,7 @@
         </div>
 
         <!-- Livewire Component -->
-        @livewire('themes-list')
+        @livewire('theme.themes-list')
     </div>
 </div>
 @endsection
