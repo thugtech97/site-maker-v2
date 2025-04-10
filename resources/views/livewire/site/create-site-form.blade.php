@@ -97,7 +97,8 @@
                 <div class="d-flex flex-wrap">
                     @foreach ($modules as $index => $module)
                         <div class="form-check" style="width: 33.33%; margin-bottom: 10px;">
-                            <input 
+                            <input
+                                disabled
                                 type="checkbox" 
                                 id="module_{{ $module->id }}" 
                                 class="form-check-input" 

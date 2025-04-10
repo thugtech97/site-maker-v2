@@ -82,7 +82,7 @@ class CreateSiteForm extends Component
         $this->themes = Theme::all();
         $this->modules = Module::all();
         // Add IDs of pre-selected modules here
-        $this->module_ids = [1, 2, 3, 4, 5, 6, 7, 8];
+        $this->module_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9 ,10, 11];
     }
 
     public function render()
