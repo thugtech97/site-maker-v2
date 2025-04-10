@@ -5,7 +5,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 	<meta http-equiv="x-ua-compatible" content="IE=edge">
 	<meta name="author" content="SemiColonWeb">
-	<meta name="description" content="Create Business &amp; Corporate Websites with Canvas Template. Get Canvas to build powerful websites easily with the Highly Customizable &amp; Best Selling Bootstrap Template, today.">
+	<meta name="description" content="Build professional business websites effortlessly with WSI-SITE-BUILDER. Use our powerful and customizable tools to launch your online presence quickly and effectively.">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 
 	<!-- Font Imports -->
