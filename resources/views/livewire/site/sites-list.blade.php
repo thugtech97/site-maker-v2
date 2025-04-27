@@ -35,15 +35,21 @@
                     </div>
 
                     <div class="card-body">
-                        <h5 class="card-title text-primary">{{ $site->website_name }}</h5>
+                        <a href="{{ route('sites.show', ['site' => $site->id]) }}">
+                            <h5 class="card-title text-primary">{{ $site->website_name }}</h5>
+                        </a>
                         <p class="card-text">
                             <strong>URL:</strong> <a href="https://www.{{ $site->url }}" target="_blank">{{ $site->url }}</a><br>
                             <strong>Created On:</strong> {{ $site->created_at->format('M d, Y') }}
                         </p>
-                        
-                        <!-- View Details Button -->
-                        <button wire:click="view({{ $site->id }})" class="btn btn-sm">
-                            <i class="fa fa-info-circle"></i> Site Info
+
+                        <!-- Edit Site Button -->
+                        <a href="{{ route('sites.edit', $site->id) }}" class="btn btn-sm">
+                            <i class="fa fa-edit"></i> Edit
+                        </a>
+                        <!-- Delete Button -->
+                        <button type="button" class="btn btn-sm" onclick="confirmDelete({{ $site->id }})">
+                            <i class="fa fa-trash"></i> Delete
                         </button>
 
                         <!-- Build Button (Visible for DRAFT sites only) -->
@@ -61,12 +67,20 @@
 
                         <!-- Launch Button -->
                         @if ($site->status === 'BUILT')
-                        <a 
-                            href="{{ env('APP_URL') }}/wsi-sites/created-sites/{{ Str::slug($site->website_name) }}/public"
-                            target="_blank"
-                            class="btn btn-sm">
-                            <i class="fa fa-play"></i> Launch
-                        </a>
+                            <a 
+                                href="{{ env('APP_URL') }}/wsi-sites/created-sites/{{ Str::slug($site->website_name) }}/public"
+                                target="_blank"
+                                class="btn btn-sm">
+                                <i class="fa fa-play"></i> Launch
+                            </a>
+                            <button type="button" wire:click="rebuild({{ $site->id }})" wire:loading.attr="disabled" class="btn btn-sm me-2">
+                                <i class="fa fa-hammer"></i> Rebuild
+                            </button>
+                            <div wire:loading wire:target="rebuild({{ $site->id }})">
+                                <div class="spinner-border text-success" style="width: 1rem; height: 1rem;" role="status">
+                                    <span class="visually-hidden">Rebuilding...</span>
+                                </div>
+                            </div>
                     
                         @endif
                     </div>
@@ -88,5 +102,9 @@
 </div>
 
 <script>
-    
+    function confirmDelete(siteId) {
+        if (confirm("Are you sure you want to delete this site?")) {
+            @this.call('delete', siteId);
+        }
+    }
 </script>

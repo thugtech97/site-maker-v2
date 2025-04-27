@@ -35,7 +35,7 @@ class SitesController extends Controller
      */
     public function show(string $id)
     {
-        return view('pages.sites.view');
+        return view('pages.sites.view', ["siteId" => $id]);
     }
 
     /**
@@ -43,7 +43,7 @@ class SitesController extends Controller
      */
     public function edit(string $id)
     {
-        return view('pages.sites.create');
+        return view('pages.sites.edit', ['siteId' => $id]);
     }
 
     /**

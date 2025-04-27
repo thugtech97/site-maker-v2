@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Site;
 
+use Exception;
 use App\Models\Site;
 use Livewire\Component;
 use App\Models\Settings;
@@ -10,6 +11,7 @@ use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Livewire\Features\SupportRedirects\Redirector;
 
 class SitesList extends Component
 {
@@ -229,8 +231,97 @@ class SitesList extends Component
         $this->dispatch('site-launch', ['url' => $siteUrl]);
     }
 
+    public function delete($siteId)
+    {
+        try {
+            $website = Site::findOrFail($siteId);
+            $slug = Str::slug($website->website_name);
+            $oldPath = $this->createdSiteDirectory . '/' . $slug;
+            $newProject = $this->createdSiteDirectory . '/' . $website->vacant_folder;
+            if (File::exists($oldPath)) {
+                File::move($oldPath, $newProject);
+                File::moveDirectory($newProject, $this->destinationDirectory . '/vacant-sites/' . $website->vacant_folder);
+            }
+            DB::statement("DROP DATABASE IF EXISTS `wsi-$slug`");
+            $website->delete();
+            session()->flash('success', 'Site has been successfully deleted!');
+        } catch (Exception $e) {
+            session()->flash('error', 'Error: ' . $e->getMessage());
+        }
+    }
 
-    public function view($siteId){
+    public function rebuild($siteId)
+    {
+        // Find the site by ID
+        $site = Site::find($siteId);
+
+        if (!$site) {
+            session()->flash('error', 'Site not found.');
+            return;
+        }
+
+        try{
+            $websiteModules = $site->modules;
+            $submodules = Submodule::whereIn('module_id', $websiteModules->pluck('id'))
+                ->join('modules', 'submodules.module_id', '=', 'modules.id')
+                ->select('submodules.*', 'modules.name as module')
+                ->get();
+            
+            $companyName = $site->company;
+            $email = $site->email;
+            $mobile_no = $site->contact_number;
+            $slug = Str::slug($site->website_name);
+
+            ini_set('max_execution_time', 600);
+            
+            $newProject = $this->createdSiteDirectory.'/'.$slug;
+
+            //transfer theme assets
+            $sourceAsset = $this->destinationDirectory.'/themes/'.$site->theme->path.'/assets';
+            $targetAsset = $newProject.'/public/theme';
+            File::copyDirectory($sourceAsset, $targetAsset);
+
+            //transfer theme views
+            $sourceView = $this->destinationDirectory.'/themes/'.$site->theme->path.'/views';
+            $targetView = $newProject.'/resources/views/theme';
+            File::copyDirectory($sourceView, $targetView);
+
+            //transfer logo
+            $sourceLogo = storage_path('app/public/'.$site->logo);
+            $destinationLogo = $newProject.'/public/storage/logos/site-logo.png';
+            File::copy($sourceLogo, $destinationLogo);
+
+            //create db & setting up environment and seeders
+            DB::statement("DROP DATABASE IF EXISTS `wsi-$slug`");
+            DB::statement("CREATE DATABASE `wsi-$slug`");
+
+            DB::statement("USE `wsi-$slug`");
+            DB::unprepared(file_get_contents(public_path('sql/wsi-site.sql')));
+            DB::unprepared(file_get_contents($this->destinationDirectory.'/themes/'.$site->theme->path.'/assets/content.sql'));
+
+            DB::statement("UPDATE settings SET website_name = '$companyName', company_name = '$companyName', email = '$email', mobile_no = '$mobile_no' WHERE id = 1");
+            DB::statement("UPDATE banners SET image_path = ? WHERE id = 4", [ env('APP_URL') . '/wsi-sites/created-sites/' . $slug . '/storage/banners/banner.png']);
+            DB::statement("UPDATE users SET email = '$email' WHERE id = 1");
+            $this->seedPermissions($submodules->toArray());
+            
+            $this->configureEnvFile('DB_DATABASE', 'wsi-' . $slug, $newProject);
+            //$this->configureEnvFile('APP_URL', 'http://127.0.0.1:' . $website->port, $newProject);
+            $this->configureEnvFile('APP_NAME', '"'.$site->website_name.'"', $newProject);
+            $this->configureEnvFile('APP_URL', env('APP_URL') . '/wsi-sites/created-sites/' . $slug . '/public', $newProject);
+            $this->configureEnvFile('DB_PORT', env('DB_PORT'), $newProject);
+            $this->changeSeederValues('company_name', $companyName, $newProject);
+            $this->changeSeederValues('website_name', $companyName, $newProject);
+            $this->updatePermissionsSeeder($submodules, $newProject);
         
+            //File::moveDirectory($newProject, $this->createdSiteDirectory.'/'.$slug);
+            DB::statement("USE `site-maker-v2`");
+            $site->update(["status" => "BUILT"]);
+            
+            session()->flash('success', 'Site named '.$site->website_name.' has been successfully rebuilt!');
+            
+        }catch(Exception $e){
+            session()->flash('error', 'An error occurred while rebuilding the site "' . $site->website_name . '". Please try again later. Error: ' . $e->getMessage());
+            return;
+        }
     }
 }
